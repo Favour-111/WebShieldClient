@@ -85,7 +85,7 @@ const Dashboard = () => {
       {/* Hero banner */}
       <motion.div
         variants={staggerItem}
-        className="relative overflow-hidden rounded-2xl p-4 md:p-8 bg-gradient-to-r from-[#0a1628] to-[#051020] border border-[#00ff9d]/10"
+        className="relative overflow-hidden sm:mt-13 lg:mt-0 rounded-2xl p-4 md:p-8 bg-gradient-to-r from-[#0a1628] to-[#051020] border border-[#00ff9d]/10"
       >
         <div className="absolute right-0 top-0 bottom-0 w-48 opacity-5 pointer-events-none" style={{
           backgroundImage: 'repeating-linear-gradient(90deg, #00ff9d 0, #00ff9d 1px, transparent 0, transparent 50%)',

@@ -62,7 +62,7 @@ const Navbar = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="sticky top-0 z-20 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 px-6 py-3.5">
+    <header className="fixed top-0 inset-x-0 z-50 lg:sticky bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 px-6 py-3.5">
       <div className="flex items-center justify-between gap-4">
         {/* Left: Menu + Title */}
         <div className="flex items-center gap-4">
