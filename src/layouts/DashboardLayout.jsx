@@ -13,6 +13,21 @@ const DashboardLayout = () => {
     setMobileSidebarOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
+    const handleViewportChange = (event) => {
+      if (event.matches) {
+        setMobileSidebarOpen(false);
+      }
+    };
+
+    handleViewportChange(mediaQuery);
+    mediaQuery.addEventListener('change', handleViewportChange);
+
+    return () => mediaQuery.removeEventListener('change', handleViewportChange);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#020617] flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}

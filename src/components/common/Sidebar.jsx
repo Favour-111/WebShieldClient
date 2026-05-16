@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -23,6 +24,20 @@ const Sidebar = ({ collapsed, onToggle, mobileOpen, onMobileClose }) => {
   const { user, logout, isAdmin } = useAuth();
   const { activeScan } = useScan();
   const location = useLocation();
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
+    const handleViewportChange = (event) => {
+      setIsDesktop(event.matches);
+    };
+
+    handleViewportChange(mediaQuery);
+    mediaQuery.addEventListener('change', handleViewportChange);
+
+    return () => mediaQuery.removeEventListener('change', handleViewportChange);
+  }, []);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -176,20 +191,22 @@ const Sidebar = ({ collapsed, onToggle, mobileOpen, onMobileClose }) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <motion.aside
-        animate={{ width: collapsed ? 64 : 240 }}
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
-        className="hidden lg:flex flex-col bg-[#0a1628] border-r border-white/5 fixed left-0 inset-y-0 z-30"
-      >
-        <SidebarContent />
-        {/* Collapse Toggle */}
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-[#0a1628] border border-[#00ff9d]/20 flex items-center justify-center text-slate-400 hover:text-[#00ff9d] transition-colors z-10"
+      {isDesktop && (
+        <motion.aside
+          animate={{ width: collapsed ? 64 : 240 }}
+          transition={{ duration: 0.25, ease: 'easeInOut' }}
+          className="hidden lg:flex flex-col bg-[#0a1628] border-r border-white/5 fixed left-0 inset-y-0 z-30"
         >
-          {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
-        </button>
-      </motion.aside>
+          <SidebarContent />
+          {/* Collapse Toggle */}
+          <button
+            onClick={onToggle}
+            className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-[#0a1628] border border-[#00ff9d]/20 flex items-center justify-center text-slate-400 hover:text-[#00ff9d] transition-colors z-10"
+          >
+            {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+          </button>
+        </motion.aside>
+      )}
 
       {/* Mobile Sidebar */}
       <AnimatePresence>

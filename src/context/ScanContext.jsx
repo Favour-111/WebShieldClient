@@ -5,6 +5,26 @@ import { useAuth } from './AuthContext';
 
 const ScanContext = createContext(null);
 
+const getSocketUrl = () => {
+  const rawApiUrl = import.meta.env.VITE_API_URL?.trim();
+
+  if (!rawApiUrl) {
+    return window.location.origin;
+  }
+
+  const normalizedApiUrl = rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+
+  if (normalizedApiUrl.startsWith('/')) {
+    return window.location.origin;
+  }
+
+  try {
+    return new URL(normalizedApiUrl).origin;
+  } catch {
+    return window.location.origin;
+  }
+};
+
 export const ScanProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const [activeScan, setActiveScan] = useState(null);
@@ -26,7 +46,8 @@ export const ScanProvider = ({ children }) => {
     const token = localStorage.getItem('webshield_token');
     if (!token) return;
 
-    const socket = io('/', {
+    const socket = io(getSocketUrl(), {
+      path: '/socket.io',
       auth: { token },
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 5,
