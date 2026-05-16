@@ -101,11 +101,6 @@ const Login = () => {
       </form>
 
       {/* Demo credentials hint */}
-      <div className="mt-4 p-3 rounded-xl bg-[#38bdf8]/5 border border-[#38bdf8]/15">
-        <p className="text-[11px] text-slate-500 font-mono">
-          Demo: <span className="text-[#38bdf8]">john@example.com</span> / <span className="text-[#38bdf8]">User@1234</span>
-        </p>
-      </div>
 
       <p className="text-center text-sm text-slate-500 mt-6">
         Don't have an account?{' '}
