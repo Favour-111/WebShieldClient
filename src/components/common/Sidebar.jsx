@@ -199,7 +199,7 @@ const Sidebar = ({ collapsed, onToggle, mobileOpen, onMobileClose }) => {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="fixed left-0 top-0 bottom-0 w-[240px] bg-[#0a1628] border-r border-white/5 z-50 lg:hidden flex flex-col"
+            className="fixed inset-y-0 left-0 h-dvh w-[240px] bg-[#0a1628] border-r border-white/5 z-50 lg:hidden flex flex-col shadow-2xl"
           >
             <button
               onClick={onMobileClose}
