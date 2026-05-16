@@ -66,7 +66,6 @@ const Landing = () => {
               </button>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-slate-400 hover:text-white transition-colors px-3 py-2">Sign In</Link>
                 <Link to="/register" className="btn-primary px-4 py-2 text-sm">Get Started</Link>
               </>
             )}
