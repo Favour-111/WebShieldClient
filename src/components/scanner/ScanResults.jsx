@@ -4,13 +4,41 @@ import { CheckCircle, FileText, BarChart2 } from 'lucide-react';
 import { getSeverityBg, getRiskLevel, formatDuration } from '../../utils/helpers';
 import { staggerContainer, staggerItem } from '../../animations';
 
-const ScanResults = ({ scan, vulnCount = 0 }) => {
+const SEVERITIES = ['critical', 'high', 'medium', 'low', 'info'];
+
+const buildSummaryFromVulns = (liveVulns = []) => {
+  const summary = { total: 0, critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+
+  liveVulns.forEach((vuln) => {
+    const severity = vuln?.severity?.toLowerCase();
+    summary.total += 1;
+    if (summary[severity] !== undefined) summary[severity] += 1;
+  });
+
+  return summary;
+};
+
+const getRiskScore = (summary = {}) => Math.min(
+  100,
+  (summary.critical || 0) * 25 +
+    (summary.high || 0) * 15 +
+    (summary.medium || 0) * 8 +
+    (summary.low || 0) * 3 +
+    (summary.info || 0) * 1
+);
+
+const ScanResults = ({ scan, liveVulns = [] }) => {
   const navigate = useNavigate();
   if (!scan || scan.status !== 'completed') return null;
 
-  const { summary = {}, riskScore, duration } = scan;
+  const fallbackSummary = buildSummaryFromVulns(liveVulns);
+  const summary = scan.summary?.total > 0 ? scan.summary : fallbackSummary;
+  const riskScore = typeof scan.riskScore === 'number'
+    ? scan.riskScore
+    : getRiskScore(summary);
+  const duration = scan.duration;
 
-  const SEVERITIES = [
+  const severityRows = [
     { key: 'critical', label: 'Critical', color: 'text-red-400' },
     { key: 'high', label: 'High', color: 'text-orange-400' },
     { key: 'medium', label: 'Medium', color: 'text-amber-400' },
@@ -58,7 +86,7 @@ const ScanResults = ({ scan, vulnCount = 0 }) => {
       {/* Severity Breakdown */}
       <motion.div variants={staggerItem} className="glass-card p-4 space-y-2">
         <div className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-3">Findings Summary</div>
-        {SEVERITIES.map(({ key, label, color }) => (
+        {severityRows.map(({ key, label, color }) => (
           <div key={key} className="flex items-center justify-between">
             <span className="text-xs text-slate-400">{label}</span>
             <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import ScanForm from '../components/scanner/ScanForm';
 import ScanProgress from '../components/scanner/ScanProgress';
 import ScanResults from '../components/scanner/ScanResults';
 import { useScan } from '../context/ScanContext';
+import { scanService } from '../services';
 import { staggerContainer, staggerItem } from '../animations';
 
 const Scanner = () => {
@@ -15,13 +16,6 @@ const Scanner = () => {
     setCurrentScan(scan);
     joinScanRoom(scan._id);
   };
-
-  // Sync active scan from context
-  useEffect(() => {
-    if (activeScan && activeScan._id !== currentScan?._id) {
-      setCurrentScan(activeScan);
-    }
-  }, [activeScan]);
 
   const scanId = currentScan?._id;
   const progress = scanId ? (scanProgress[scanId] ?? 0) : 0;
@@ -35,6 +29,40 @@ const Scanner = () => {
 
   // Merge the live status back into currentScan for child components
   const scanWithStatus = currentScan ? { ...currentScan, status: effectiveStatus || currentScan.status } : null;
+
+  // Sync active scan from context
+  useEffect(() => {
+    if (activeScan && activeScan._id !== currentScan?._id) {
+      setCurrentScan(activeScan);
+    }
+  }, [activeScan]);
+
+  useEffect(() => {
+    if (!scanId || effectiveStatus !== 'completed') return;
+
+    const hasFinalData = Boolean(currentScan?.completedAt) || currentScan?.summary?.total > 0;
+
+    if (hasFinalData) return;
+
+    let cancelled = false;
+
+    const hydrateCompletedScan = async () => {
+      try {
+        const res = await scanService.getScanById(scanId);
+        if (!cancelled && res.data?.scan) {
+          setCurrentScan(res.data.scan);
+        }
+      } catch (error) {
+        console.error('Failed to load completed scan details', error);
+      }
+    };
+
+    hydrateCompletedScan();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [scanId, effectiveStatus, currentScan?.summary?.total, currentScan?.riskScore, currentScan?.duration]);
 
   return (
     <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6 max-w-5xl mx-auto">
@@ -96,7 +124,7 @@ const Scanner = () => {
           ) : isCompleted ? (
             <>
               <h2 className="text-sm font-semibold text-white mb-5">Scan Results</h2>
-              <ScanResults scan={scanWithStatus} vulnCount={liveVulns.length} />
+              <ScanResults scan={scanWithStatus} liveVulns={liveVulns} />
             </>
           ) : (
             <>
